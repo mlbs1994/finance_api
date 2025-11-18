@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.mlbs.finance_api.entities.dto.ApiErrorDTO;
 
@@ -15,8 +16,8 @@ import jakarta.servlet.http.HttpServletRequest;
 @RestControllerAdvice
 public class FinanceApiExceptionHandler {
 
-	@ExceptionHandler(ResourceNotFoundException.class)
-	public ResponseEntity<ApiErrorDTO> handleError404(ResourceNotFoundException ex, HttpServletRequest request) {
+	@ExceptionHandler({ResourceNotFoundException.class, NoResourceFoundException.class})
+	public ResponseEntity<ApiErrorDTO> handleError404(Exception ex, HttpServletRequest request) {
 		return buildResponse(ErrorType.RESOURCE_NOT_FOUND, "Resource Not Found", HttpStatus.NOT_FOUND, ex.getMessage(), request.getRequestURI());
 	}
 
@@ -25,9 +26,9 @@ public class FinanceApiExceptionHandler {
 		return buildResponse(ErrorType.BAD_REQUEST, "Bad Request", HttpStatus.BAD_REQUEST, ex.getMessage(), request.getRequestURI());
 	}
 
-	@ExceptionHandler(Throwable.class)
-	public ResponseEntity<ApiErrorDTO> handleError500(Throwable th, HttpServletRequest request) {
-		return buildResponse(ErrorType.INTERNAL_SERVER_ERROR, "Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR, th.getMessage(), request.getRequestURI());
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<ApiErrorDTO> handleError500(Exception ex, HttpServletRequest request) {
+		return buildResponse(ErrorType.INTERNAL_SERVER_ERROR, "Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), request.getRequestURI());
 	}
 	
 	@ExceptionHandler(MethodArgumentNotValidException.class)
